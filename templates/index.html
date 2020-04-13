@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="//code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" />
+        <script type="text/javascript" src="{{ url_for('static', filename='tracking.js') }}"></script>
+
+        <title>You're currently not logged in</title>
+    </head>
+    <body class="p-3 mb-2 bg-dark text-white">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="#">App Overview</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon"></span>
+                </button>
+                <ul class="navbar-nav mr-auto">
+                </ul>
+                <a href="/google/login" class="btn btn-success" role="button" aria-pressed="true">Login</a>
+            </div>
+          </nav>
+        <br>
+        <h1 class="text-center">Advanced Analysis App</h1>
+        <br>
+        <br>
+        <h3 class="text-center">You're currently not logged in</h2>
+        <br>
+        <h4 class="text-center">Please <a href="http://localhost:8040/google/login">log in</a> first</h4>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <div class="fixed-bottom">
+            <p class="text-center">Made with <i class="icon ion-heart"></i> in Copenhagen</p>
+        </div>
+    </body>
+</html>

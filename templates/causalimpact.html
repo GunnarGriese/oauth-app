@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="//code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" />
+    <script type="text/javascript" src="{{ url_for('static', filename='tracking.js') }}"></script>
+    <!--<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">-->
+    <title>{{ title }} - image</title>
+  </head>
+  <body class="p-3 mb-2 bg-dark text-white">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div class="container">
+          <a class="navbar-brand" href="#">App Overview</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="/causal-impact">Causal Impact<span class="sr-only">(current)</span></a>
+              </li>
+          </ul>
+          <span class="navbar-text mr-2 text-white">
+            Currently logged in as {{ user_info['given_name'] }} {{ user_info['family_name'] }}
+          </span>
+          <a href="/google/logout" class="btn btn-danger" role="button" aria-pressed="true">Logout</a>
+      </div>
+    </nav>
+    <h3 class="p-3 mb-2 bg-dark text-white">Causal Impact Graph</h3>
+    <!--<img src="{{ url_for('causal_impact.fig') }}" alt="Image Placeholder" height="100">-->
+    <img src="/causal-impact-graph.png" alt="random points as png" height="30%" width="100%">
+    <div></div>
+    <br>
+    <div class="fixed-bottom">
+      <p class="text-center">Made with <i class="icon ion-heart"></i> in Copenhagen</p>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+  </body>
+</html>
