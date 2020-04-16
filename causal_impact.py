@@ -1,4 +1,5 @@
 import io
+import os
 import tempfile
 import flask
 from flask import Response
@@ -117,3 +118,12 @@ def fig():
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype="image/png")
     #return flask.send_file(img, mimetype='image/png')
+
+@app.route('/return-causal-impact-image')
+def return_files_tut():
+    filename = flask.safe_join(app.root_path, "/causal-impact-graph.png")
+    print(filename)
+    try:
+        return flask.send_from_directory(directory=filename,filename='causal-impact-graph.png')
+    except Exception as e:
+        return str(e)
