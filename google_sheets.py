@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 import pandas as pd
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
-SPREADSHEET_ID = '1d3PV4NPgsRfeNVaDgOjTpkJGMl3bMiRSENU9708ajLc'
+SPREADSHEET_ID_CAUSAL = '1d3PV4NPgsRfeNVaDgOjTpkJGMl3bMiRSENU9708ajLc'
 RANGE_NAME = 'CausalImpact!A15:B'
 
 app = flask.Blueprint('google_sheets', __name__)
@@ -18,7 +18,7 @@ def build_sheets():
 
 def get_data():
     g_service = build_sheets()
-    gsheet = g_service.spreadsheets().values().get(spreadsheetId=SPREADSHEET_ID, range=RANGE_NAME).execute()
+    gsheet = g_service.spreadsheets().values().get(spreadsheetId=SPREADSHEET_ID_CAUSAL, range=RANGE_NAME).execute()
     return gsheet
 
 def gsheet2df():

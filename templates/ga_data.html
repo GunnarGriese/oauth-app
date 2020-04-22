@@ -8,11 +8,10 @@
     <link rel="stylesheet" type="text/css" href="//code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" />
     <script type="text/javascript" src="{{ url_for('static', filename='tracking.js') }}"></script>
     <!--<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">-->
-    <title>Google Sheets Data</title>
+    <title>GA Data Quality</title>
 </head>
 
 <body class="p-3 mb-2 bg-dark text-white">
-
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
             <a class="navbar-brand" href="/">App Overview</a>
@@ -33,12 +32,62 @@
             <span class="navbar-text mr-2 text-white">
             Currently logged in as {{ user_info['given_name'] }} {{ user_info['family_name'] }}
           </span>
-            <!--<a href="#" class="navbar-nav mr-1"><img src="{{ user_info['picture'] }}" width="10%" height="10%"></a>-->
             <a href="/google/logout" class="btn btn-danger" role="button" aria-pressed="true">Logout</a>
         </div>
     </nav>
-    <h3 class="p-3 mb-2 bg-dark text-white">Data Overview</h3>
-    {% for table in tables %} {{ table|safe }} {% endfor %}
+    <div>
+        <h3 class="p-3 mb-2 bg-dark text-white">Data Quality Input</h3>
+    </div>
+    <div>
+        <form action="/ga-settings" method="POST">
+            <div class="row">
+                <div class="col">
+                    <input type="text" class="form-control" name="account" placeholder="Account">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="property" placeholder="Property">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="view" placeholder="View">
+                </div>
+            </div>
+            <br>
+            <input type="submit" class="btn btn-success"></input>
+        </form>
+    </div>
+    <br>
+    <br> {% if query_params %}
+    <div>
+        <h3>Query Parameters detected</h3>
+        <ol>
+            {% for param in query_params %}
+            <li>{{ param }}</li>
+            {% endfor %}
+        </ol>
+        <h3>Channel anomalies</h3>
+        <ol>
+            <li>Direct share is: {{ direct_share }}%</li>
+            <ul>
+                {% if direct_share > 15 %}
+                <li>This might be an indicator for broken utm_tagging</li>
+                {% else %}
+                <li>Nothing special here</li>
+                {% endif %}
+            </ul>
+            <li>(Other) share is: {{ other_share }}%</li>
+            <ul>
+                {% if other_share > 3 %}
+                <li>This might be an indicator for incorrect channel settings</li>
+                {% else %}
+                <li>Nothing special here</li>
+                {% endif %}
+            </ul>
+        </ol>
+    </div>
+    {% endif %}
+    <br>
+    <!-- Add icon library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <div class="fixed-bottom">
         <p class="text-center">Made with <i class="icon ion-heart"></i> in Copenhagen</p>
     </div>
