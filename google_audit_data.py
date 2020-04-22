@@ -12,7 +12,7 @@ import requests
 from urllib import parse
 
 app = flask.Blueprint('google_audit_data', __name__)
-VIEW_ID = 'xxxxxx'
+VIEW_ID = '206310085'
 
 def build_service():
     credentials = google_auth.build_credentials()
@@ -20,15 +20,15 @@ def build_service():
 
 # https://docs.google.com/spreadsheets/d/1bCL3eXcATDGloD-9pFodBMg-eBUuakMQdaZIpuRv7iE/edit#gid=988872659
 
-def get_report(api_service, VIEW_ID):
-  """Queries the Analytics Reporting API V4.
+def get_query_params(api_service, VIEW_ID):
+    """Queries the Analytics Reporting API V4.
 
-  Args:
-    analytics: An authorized Analytics Reporting API V4 service object.
-  Returns:
-    The Analytics Reporting API V4 response.
-  """
-  return api_service.reports().batchGet(
+    Args:
+        analytics: An authorized Analytics Reporting API V4 service object.
+    Returns:
+        The Analytics Reporting API V4 response.
+    """
+    report = api_service.reports().batchGet(
       body={
         'reportRequests': [
         {
@@ -38,8 +38,20 @@ def get_report(api_service, VIEW_ID):
           'dimensions': [{'name': 'ga:pagePath'}],
           "pageSize": 100000
         }]
-      }
-  ).execute()
+      }).execute()
+    df = response2df(report) # To Do: work with lists rather than dfs
+    query_df = df[df['ga:pagePath'].str.contains('?', regex=False)==True] # To Do: Directly filter for pages w/ params in api request
+    query_params = []
+    for url in query_df['ga:pagePath']:
+        key_list = dict(parse.parse_qs(parse.urlsplit(url).query)).keys()
+        for key in key_list:
+            query_params.append(key)
+    query_params = list(set(query_params))
+    pii_df = df[df['ga:pagePath'].str.contains('@', regex=False)==True]
+    pii_urls = []
+    for url in pii_df['ga:pagePath']:
+        pii_urls.append(url)
+    return query_params, pii_urls
 
 def get_traffic_report(api_service, VIEW_ID):
 
@@ -109,33 +121,16 @@ def response2df(report):
 
 @app.route('/ga-data', methods=['GET', 'POST'])
 def ga_data():
-    api_service = build_service()
-    report = get_report(api_service, VIEW_ID)
-    df = response2df(report) # To Do: work with lists rather than dfs
-    df = df[df['ga:pagePath'].str.contains('?', regex=False)==True] # To Do: Directly filter for pages w/ params
-    query_params = []
-    for url in df['ga:pagePath']:
-        key_list = dict(parse.parse_qs(parse.urlsplit(url).query)).keys()
-        for key in key_list:
-            query_params.append(key)
-    query_params = list(set(query_params))    
     req_data = flask.request.form
-    direct_share, other_share = get_traffic_report(api_service, VIEW_ID)
     if (flask.request.method == "POST") or (flask.request.method == "GET"):
         api_service = build_service()
-        report = get_report(api_service, VIEW_ID)
-        df = response2df(report) # To Do: work with lists rather than dfs
-        df = df[df['ga:pagePath'].str.contains('?', regex=False)==True]
-        query_params = []
-        for url in df['ga:pagePath']:
-            key_list = dict(parse.parse_qs(parse.urlsplit(url).query)).keys()
-            for key in key_list:
-                query_params.append(key)
-        query_params = list(set(query_params))
+        query_params, pii_urls = get_query_params(api_service, VIEW_ID) 
+        direct_share, other_share = get_traffic_report(api_service, VIEW_ID)
         return flask.render_template('ga_data.html', 
                                     user_info=google_auth.get_user_info(),
                                     query_params=query_params,
                                     direct_share=direct_share,
-                                    other_share=other_share)
+                                    other_share=other_share,
+                                    pii_urls=pii_urls)
     
     return flask.render_template('ga_data.html', user_info=google_auth.get_user_info())

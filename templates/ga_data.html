@@ -64,6 +64,12 @@
             <li>{{ param }}</li>
             {% endfor %}
         </ol>
+        <h3>PII detected</h3>
+        <ol>
+            {% for url in pii_urls %}
+            <li>{{ url }}</li>
+            {% endfor %}
+        </ol>
         <h3>Channel anomalies</h3>
         <ol>
             <li>Direct share is: {{ direct_share }}%</li>
