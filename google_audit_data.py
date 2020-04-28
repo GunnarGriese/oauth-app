@@ -76,6 +76,29 @@ def get_traffic_report(api_service, VIEW_ID):
   #direct = True if direct_share > 15 else False
   return round(direct_share[0], 2), round(other_share[0], 2)
 
+def get_lp_report(api_service, VIEW_ID):
+
+  report = api_service.reports().batchGet(
+      body={
+        'reportRequests': [
+        {
+          'viewId': VIEW_ID,
+          'dateRanges': [{'startDate': '7daysAgo', 'endDate': 'today'}],
+          'metrics': [{'expression': 'ga:sessions'},
+                      {'expression': 'ga:bounceRate'}],
+          'dimensions': [{'name': 'ga:landingPagePath'}],
+          "pageSize": 100000
+        }]
+      }
+  ).execute()
+  df = response2df(report)
+  df["ga:sessions"] = df["ga:sessions"].astype('int64')
+  df["ga:bounceRate"] = df["ga:bounceRate"].astype('float64')
+  df['perc'] = df['ga:sessions'] / df['ga:sessions'].sum()
+  df = df[(df['perc']>0.03) & (df['ga:bounceRate']>=20)] # adjust thresholds
+  df.columns = ['Landing Page', 'Sessions', 'Bounce Rate', 'Session Share']
+  return df
+
 def response2df(report):
     """Parses and prints the Analytics Reporting API V4 response"""
     report = report.get('reports', [])[0]
@@ -126,11 +149,13 @@ def ga_data():
         api_service = build_service()
         query_params, pii_urls = get_query_params(api_service, VIEW_ID) 
         direct_share, other_share = get_traffic_report(api_service, VIEW_ID)
+        bounce = get_lp_report(api_service, VIEW_ID)
         return flask.render_template('ga_data.html', 
                                     user_info=google_auth.get_user_info(),
                                     query_params=query_params,
                                     direct_share=direct_share,
                                     other_share=other_share,
-                                    pii_urls=pii_urls)
+                                    pii_urls=pii_urls,
+                                    bounce=[bounce.to_html(classes='table')],)
     
     return flask.render_template('ga_data.html', user_info=google_auth.get_user_info())

@@ -14,6 +14,7 @@ import google_sheets
 import causal_impact
 import google_audit
 import google_audit_data
+import account_structure
 
 
 app = flask.Flask(__name__)
@@ -24,13 +25,12 @@ app.register_blueprint(google_sheets.app)
 app.register_blueprint(causal_impact.app)
 app.register_blueprint(google_audit.app)
 app.register_blueprint(google_audit_data.app)
+app.register_blueprint(account_structure.app)
 
 @app.route('/')
 def index():
     if google_auth.is_logged_in():
         df = google_sheets.gsheet2df()
-        #columns = df.columns.values
-        #columns[:0] = ['Index']
         columns = deque(df.columns.values) 
         columns.appendleft('Index') 
         columns = list(columns) 
@@ -42,8 +42,3 @@ def index():
         return flask.render_template('dataframe.html', tables=[df.to_html(classes='table')], titles=columns, user_info=google_auth.get_user_info()) #items['files']
 
     return flask.render_template('index.html')
-
-#@app.route('/causal-impact')
-#def causal_impact():
-#    if google_auth.is_logged_in():
-#        df = google_sheets.gsheet2df()

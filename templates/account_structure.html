@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="//code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" />
     <script type="text/javascript" src="{{ url_for('static', filename='tracking.js') }}"></script>
     <!--<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">-->
-    <title>GA Data Quality</title>
+    <title>GA Audit</title>
 </head>
 
 <body class="p-3 mb-2 bg-dark text-white">
@@ -36,10 +36,10 @@
         </div>
     </nav>
     <div>
-        <h3 class="p-3 mb-2 bg-dark text-white">Data Quality Input</h3>
+        <h3 class="p-3 mb-2 bg-dark text-white">Audit Input</h3>
     </div>
     <div>
-        <form action="/ga-settings" method="POST">
+        <form action="/ga-account-structure" method="POST">
             <div class="row">
                 <div class="col">
                     <input type="text" class="form-control" name="account" placeholder="Account">
@@ -56,44 +56,41 @@
         </form>
     </div>
     <br>
-    <br> {% if query_params %}
+    <br> {% if account_name %}
     <div>
-        <h3>Query Parameters detected</h3>
-        <ol>
-            {% for param in query_params %}
-            <li>{{ param }}</li>
+        <h3>Account Overview</h3>
+        <ul>
+            <li>Account Name: {{ account_name }}</li>
+        </ul>
+        <h3>User List</h3>
+        <ul>
+            {% for user in users %}
+            <li>{{ user['userRef']['email'] }}</li>
             {% endfor %}
-        </ol>
-        <h3>PII detected</h3>
-        <ol>
-            {% if pii_urls %} {% for url in pii_urls %}
-            <li>{{ url }}</li>
-            <li>{{ pii_urls }}</li>
-            {% endfor %} {% else %}
-            <li>Nothing special here.</li>
-            {% endif %}
-        </ol>
-        <h3>Channel anomalies</h3>
-        <ol>
-            <li>Direct share is: {{ direct_share }}%</li>
+        </ul>
+        <h3>Data Retention</h3>
+        <ul>
+            <li>Data retention period: {{ data_retention["dataRetentionTtl"] }}</li>
+            <li>Reset on new activity: {{ data_retention["dataRetentionResetOnNewActivity"] }}</li>
+        </ul>
+        <h3>Filter Overview</h3>
+        {% for key, value in filters.items() %}
+        <ul>
+            <li> {{ value.name }} [{{ value.type }}]: </li>
             <ul>
-                {% if direct_share > 15 %}
-                <li>This might be an indicator for broken utm_tagging</li>
-                {% else %}
-                <li>Nothing special here</li>
-                {% endif %}
+                {% for key, value in value.details.items() %}
+                <li> {{ key }}: {{ value }} </li>
             </ul>
-            <li>(Other) share is: {{ other_share }}%</li>
-            <ul>
-                {% if other_share > 3 %}
-                <li>This might be an indicator for incorrect channel settings</li>
-                {% else %}
-                <li>Nothing special here</li>
-                {% endif %}
-            </ul>
-        </ol>
-        <h3>Unusual High Bounce Rates</h3>
-        {% for b in bounce %} {{ b|safe }} {% endfor %}
+        </ul>
+        {% endfor %} {% endfor %}
+        <h3>Demographics</h3>
+        {% for demo in demographics %} {{ demo|safe }} {% endfor %}
+
+        <h3>10 mio. hit limit</h3>
+        <ul>
+            <li>{{ hits_greater['text'] }} Your hit count for the last 30 days is: {{ hits_greater['hit_count'] }}</li>
+        </ul>
+
     </div>
     {% endif %}
     <br>

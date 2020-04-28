@@ -20,7 +20,7 @@
           </button>
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="/causal-impact">Causal Impact<span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="/ga-account-structure">Account Structure<span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item active">
                     <a class="nav-link" href="/ga-settings">GA Settings<span class="sr-only">(current)</span></a>
@@ -68,71 +68,89 @@
             <li>{{ user['userRef']['email'] }}</li>
             {% endfor %}
         </ul>
-        <h3>Property Overview - {{ property['id'] }}</h3>
-        <ul>
-            <li>Property Name: {{ property['name'] }}</li>
-            <li>Website URL: <a href="{{ property['websiteUrl'] }}">{{ property['websiteUrl'] }}</a></li>
-            <li>View number: {{ property['profileCount'] }}</li>
-            <li>Industry: {{ property['industryVertical'] }}</li>
-            <li>Data Retention: {{ property['dataRetentionTtl'] }}</li>
-            <li>Reset on new activity: {{ property['dataRetentionResetOnNewActivity'] }}</li>
-        </ul>
-        <h3>Linked Ads Accounts</h3>
-        <ul>
-            {% for ad in ads %}
-            <li>{{ ad['id'] }}</li>
-            {% for view in ad['profileIds'] %}
+        <h3>Filter Overview</h3>
+        <table>
+            {% for key, value in filters.items() %}
+            <ol>
+                <li> {{ value.name }} [{{ value.type }}] </li>
+                <li>
+                    <ul>
+                        {% for detail in value.details.values() %}
+                        <li> {{ detail }} </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ol>
+            <!--<tr>
+                <th> {{ key }}</th>
+                <td> {{ value.name }}</td>
+            </tr>-->
+            {% endfor %}
+            <h3>Property Overview - {{ property['id'] }}</h3>
             <ul>
-                <li>Linked to: {{ view }}</li>
+                <li>Property Name: {{ property['name'] }}</li>
+                <li>Website URL: <a href="{{ property['websiteUrl'] }}">{{ property['websiteUrl'] }}</a></li>
+                <li>View number: {{ property['profileCount'] }}</li>
+                <li>Industry: {{ property['industryVertical'] }}</li>
+                <li>Data Retention: {{ property['dataRetentionTtl'] }}</li>
+                <li>Reset on new activity: {{ property['dataRetentionResetOnNewActivity'] }}</li>
             </ul>
-            {% endfor %} {% endfor %}
-        </ul>
-        <h3>Custom Dimensions</h3>
-        <ul>
-            {% for cd in cds %}
-            <li>Name: {{ cd['name'] }}, Index: {{ cd['index'] }}, Scope: {{ cd['scope'] }}, Active: {{ cd['active'] }}</li>
-            {% endfor %}
-        </ul>
-        <h3>Custom Metrics</h3>
-        <ul>
-            {% for cm in cms %}
-            <li>Name: {{ cm['name'] }}, Index: {{ cm['index'] }}, Scope: {{ cm['scope'] }}, Active: {{ cm['active'] }}, Type: {{ cm['type'] }}, Min Value: {{ cm['min_value'] }}, Max Value: {{ cm['max_value'] }}</li>
-            {% endfor %}
-        </ul>
-        <h3>Audiences</h3>
-        <ul>
-            {% for audience in audiences %}
-            <li>Name: {{ audience['name'] }}, Type: {{ audience['audienceType'] }}</li>
-            {% endfor %}
-        </ul>
-        <h3>View Overview - {{ view['id'] }}</h3>
-        <ul>
-            <!--<li>View Name: {{ view['name'] }}</li>-->
-            <li>Currency Code: {{ view['currency'] }}</li>
-            <li>Timezone: {{ view['timezone'] }}</li>
-            <li>Website URL: <a href="{{ view['websiteUrl'] }}">{{ view['websiteUrl'] }}</a></li>
-            <li>Default Page: {% if not view['defaultPage'] %} not defined {% else %} {{ view['defaultPage'] }} {% endif %}</li>
-            <li>Excluded Query Parameters: {{ view['excludeQueryParameters'] }}</li>
-            <li>Site Search Query Parameters: {{ view["siteSearchQueryParameters"] }}</li>
-            <li>Strip Search Query Parameters: {{ view["stripSiteSearchQueryParameters"] }}</li>
-            <li>Site Search Category Parameters: {{ view["siteSearchCategoryParameters"] }}</li>
-            <li>Strip Search Category Parameters: {{ view["stripSiteSearchCategoryParameters"] }}</li>
-            <li>E-Com Tracking: {{ view["eCommerceTracking"] }}</li>
-            <li>Enhanced E-Com Tracking: {{ view["enhancedECommerceTracking"] }}</li>
-            <li>Bot Filtering: {{ view["botFilteringEnabled"] }}</li>
-        </ul>
-        <h3>View Filters - Filter Details available </h3>
-        <ul>
-            {% for view_filter in view_filters %}
-            <li>Name: {{ view_filter['filterRef']['name'] }}, Rank: {{ view_filter['rank'] }}</li>
-            {% endfor %}
-        </ul>
-        <h3>View Goals - Goal Details available</h3>
-        <ul>
-            {% for goal in goals %}
-            <li>Name: {{ goal['name'] }}, Value: {{ goal['value'] }}, Active: {{ goal['active'] }}</li>
-            {% endfor %}
-        </ul>
+            <h3>Linked Ads Accounts</h3>
+            <ul>
+                {% for ad in ads %}
+                <li>{{ ad['id'] }}</li>
+                {% for view in ad['profileIds'] %}
+                <ul>
+                    <li>Linked to: {{ view }}</li>
+                </ul>
+                {% endfor %} {% endfor %}
+            </ul>
+            <h3>Custom Dimensions</h3>
+            <ul>
+                {% for cd in cds %}
+                <li>Name: {{ cd['name'] }}, Index: {{ cd['index'] }}, Scope: {{ cd['scope'] }}, Active: {{ cd['active'] }}</li>
+                {% endfor %}
+            </ul>
+            <h3>Custom Metrics</h3>
+            <ul>
+                {% for cm in cms %}
+                <li>Name: {{ cm['name'] }}, Index: {{ cm['index'] }}, Scope: {{ cm['scope'] }}, Active: {{ cm['active'] }}, Type: {{ cm['type'] }}, Min Value: {{ cm['min_value'] }}, Max Value: {{ cm['max_value'] }}</li>
+                {% endfor %}
+            </ul>
+            <h3>Audiences</h3>
+            <ul>
+                {% for audience in audiences %}
+                <li>Name: {{ audience['name'] }}, Type: {{ audience['audienceType'] }}</li>
+                {% endfor %}
+            </ul>
+            <h3>View Overview - {{ view['id'] }}</h3>
+            <ul>
+                <!--<li>View Name: {{ view['name'] }}</li>-->
+                <li>Currency Code: {{ view['currency'] }}</li>
+                <li>Timezone: {{ view['timezone'] }}</li>
+                <li>Website URL: <a href="{{ view['websiteUrl'] }}">{{ view['websiteUrl'] }}</a></li>
+                <li>Default Page: {% if not view['defaultPage'] %} not defined {% else %} {{ view['defaultPage'] }} {% endif %}</li>
+                <li>Excluded Query Parameters: {{ view['excludeQueryParameters'] }}</li>
+                <li>Site Search Query Parameters: {{ view["siteSearchQueryParameters"] }}</li>
+                <li>Strip Search Query Parameters: {{ view["stripSiteSearchQueryParameters"] }}</li>
+                <li>Site Search Category Parameters: {{ view["siteSearchCategoryParameters"] }}</li>
+                <li>Strip Search Category Parameters: {{ view["stripSiteSearchCategoryParameters"] }}</li>
+                <li>E-Com Tracking: {{ view["eCommerceTracking"] }}</li>
+                <li>Enhanced E-Com Tracking: {{ view["enhancedECommerceTracking"] }}</li>
+                <li>Bot Filtering: {{ view["botFilteringEnabled"] }}</li>
+            </ul>
+            <h3>View Filters - Filter Details available </h3>
+            <ul>
+                {% for view_filter in view_filters %}
+                <li>Name: {{ view_filter['filterRef']['name'] }}, Rank: {{ view_filter['rank'] }}</li>
+                {% endfor %}
+            </ul>
+            <h3>View Goals - Goal Details available</h3>
+            <ul>
+                {% for goal in goals %}
+                <li>Name: {{ goal['name'] }}, Value: {{ goal['value'] }}, Active: {{ goal['active'] }}</li>
+                {% endfor %}
+            </ul>
     </div>
     {% endif %}
     <br>
