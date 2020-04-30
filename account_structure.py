@@ -9,7 +9,10 @@ import google_sheets
 from werkzeug.utils import secure_filename
 import pandas as pd
 import requests
-from utils import Filter, response2df
+import plotly.graph_objects as go
+import plotly
+import json
+from utils import Filter, response2df, AnalyticsReporting, AnalyticsManagement
 
 SCOPES = ['https://www.googleapis.com/auth/analytics.readonly']
 
@@ -43,6 +46,14 @@ def get_property(api_service, account_id, property_id):
         webPropertyId=property_id).execute()
     return prop
 
+def get_view_filters(mgmt_api, account_id, property_id, view_id):
+    response = mgmt_api.management().profileFilterLinks().list(
+      accountId=account_id,
+      webPropertyId=property_id,
+      profileId=view_id).execute()
+    view_filters = response.get('items', [])
+    return view_filters
+
 def handle_filters(filter_list):
     filter_dict = {}
     for idx, filter in enumerate(filter_list):
@@ -65,40 +76,51 @@ def handle_filters(filter_list):
 
     return filter_dict
 
-def get_demographics_report(api_service, VIEW_ID):
-  report = api_service.reports().batchGet(
-      body={
-        'reportRequests': [
-        {
-          'viewId': VIEW_ID,
-          'dateRanges': [{'startDate': '7daysAgo', 'endDate': 'today'}],
-          'metrics': [{'expression': 'ga:sessions'}],
-          'dimensions': [{'name': 'ga:userGender'},
-                        {'name': 'ga:userAgeBracket'}],
-          "pageSize": 100000
-        }]
-      }
-  ).execute()
-  df = response2df(report)
-  df["ga:sessions"] = df["ga:sessions"].astype('int64')
-  df['perc'] = df['ga:sessions'] / df['ga:sessions'].sum()
-  df.columns = ['Gender', 'Age Bucket', 'Sessions', 'Session Share']
-  return df
+def get_demographics_report(analytics):
+    df = analytics.report(
+        dimensions=[{'name': 'ga:userGender'}, {'name': 'ga:userAgeBracket'}],
+        metrics=[{'expression': 'ga:sessions'}],
+        date_range=['30daysAgo', 'today']
+        )
+    df["ga:sessions"] = df["ga:sessions"].astype('int64')
+    df.columns = ['Gender', 'Age Bucket', 'Sessions']
+    return df
 
-def get_hits_report(api_service, VIEW_ID):
-  report = api_service.reports().batchGet(
-      body={
-        'reportRequests': [
-        {
-          'viewId': VIEW_ID,
-          'dateRanges': [{'startDate': '30daysAgo', 'endDate': 'today'}],
-          'metrics': [{'expression': 'ga:hits'}],
-          'dimensions': [{'name': 'ga:date'}],
-          "pageSize": 100000
-        }]
-      }
-  ).execute()
-  df = response2df(report)
+
+def create_piechart(df):
+    """Create a plotly figure
+    Parameters
+    ----------
+    df : pandas.Dataframe
+    Returns
+    -------
+    fig1, fig2:
+        Plotly bar chart
+    """
+    # Count class occurences
+    df_female = df[df['Gender']=='female'].sort_values(by='Sessions', ascending=False)
+    df_male = df[df['Gender']=='male'].sort_values(by='Sessions', ascending=False)
+
+    layout = go.Layout(
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        legend=dict(
+            font=dict(
+                family="sans-serif",
+                color="white")
+                )
+            )
+    fig_female = go.Figure(data=[go.Pie(labels=df_female['Age Bucket'], values=df_female['Sessions'])], layout=layout)
+    fig_male = go.Figure(data=[go.Pie(labels=df_male['Age Bucket'], values=df_male['Sessions'])], layout=layout)
+
+    return fig_female, fig_male
+
+def get_hits_report(analytics):
+  df = analytics.report(
+        dimensions=[{'name': 'ga:date'}],
+        metrics=[{'expression': 'ga:hits'}],
+        date_range=['30daysAgo', 'today']
+        )
   df["ga:hits"] = df["ga:hits"].astype('int64')
   hits_greater = {}
   hits_greater['hit_count'] = df['ga:hits'].sum()
@@ -108,17 +130,24 @@ def get_hits_report(api_service, VIEW_ID):
 @app.route('/ga-account-structure', methods=['GET', 'POST'])
 def google_audit():
     mgmt_api = build_mgmt_service()
-    reporting_api = build_reporting_service()
+    #reporting_api = build_reporting_service()
     req_data = flask.request.form
     print(flask.request.method)
     if flask.request.method == "POST":
+        analytics = AnalyticsReporting(view_id=req_data['view'])
+        mgmt = AnalyticsManagement(req_data['account'], req_data['property'], req_data['view'])
+        #us = mgmt.list_account_users()
+        mgmt.get_property()
         accounts = get_accounts(mgmt_api)
         users = get_account_users(mgmt_api, req_data['account'])
         filters = get_account_filters(mgmt_api, req_data['account'])
         filter_data = handle_filters(filters)
         data_retention = get_property(mgmt_api, req_data['account'], req_data['property'])
-        demographics_df = get_demographics_report(reporting_api, req_data['view'])
-        hits_greater = get_hits_report(reporting_api, req_data['view'])
+        demographics_df = get_demographics_report(analytics)
+        fig_female, fig_male = create_piechart(demographics_df)
+        graphs = [fig_female, fig_male]
+        graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
+        hits_greater = get_hits_report(analytics)
         for account in accounts['items']:
             if account['id'] == req_data['account']:
                 return flask.render_template('account_structure.html', 
@@ -128,6 +157,8 @@ def google_audit():
                                                 filters=filter_data,
                                                 demographics=[demographics_df.to_html(classes='table')],
                                                 hits_greater = hits_greater,
-                                                data_retention=data_retention)
+                                                data_retention=data_retention,
+                                                ids=['Female', 'Male'],
+                                                graphJSON=graphJSON)
     
     return flask.render_template('account_structure.html', user_info=google_auth.get_user_info())
