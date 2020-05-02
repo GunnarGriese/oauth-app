@@ -55,8 +55,8 @@ def get_view_filters(mgmt_api, account_id, property_id, view_id):
     return view_filters
 
 def handle_filters(filter_list):
-    filter_dict = {}
-    for idx, filter in enumerate(filter_list):
+    filter_dict = []
+    for filter in filter_list:
         filter_ins = Filter(f_id=filter['id'], f_name=filter['name'], f_type=filter['type'], f_update=filter['updated'])
         if filter['type'] == "SEARCH_AND_REPLACE":
             filter_ins.details = filter['searchAndReplaceDetails']
@@ -72,7 +72,7 @@ def handle_filters(filter_list):
             filter_ins.details = filter["advancedDetails"]
         else:
             filter_ins.details = {'key': 'value'}
-        filter_dict["filter_{}".format(idx)] = filter_ins
+        filter_dict.append(filter_ins)
 
     return filter_dict
 
@@ -98,8 +98,8 @@ def create_piechart(df):
         Plotly bar chart
     """
     # Count class occurences
-    df_female = df[df['Gender']=='female'].sort_values(by='Sessions', ascending=False)
-    df_male = df[df['Gender']=='male'].sort_values(by='Sessions', ascending=False)
+    df_female = df[df['Gender']=='female'].sort_values(by='Age Bucket', ascending=False)
+    df_male = df[df['Gender']=='male'].sort_values(by='Age Bucket', ascending=False)
 
     layout = go.Layout(
         paper_bgcolor='rgba(0,0,0,0)',
@@ -135,13 +135,15 @@ def google_audit():
     print(flask.request.method)
     if flask.request.method == "POST":
         analytics = AnalyticsReporting(view_id=req_data['view'])
-        mgmt = AnalyticsManagement(req_data['account'], req_data['property'], req_data['view'])
+        #mgmt = AnalyticsManagement(req_data['account'], req_data['property'], req_data['view'])
         #us = mgmt.list_account_users()
-        mgmt.get_property()
+        #mgmt.get_property()
         accounts = get_accounts(mgmt_api)
         users = get_account_users(mgmt_api, req_data['account'])
+        user_chunks = [users[i:i+3] for i in range(0,len(users),3)]
         filters = get_account_filters(mgmt_api, req_data['account'])
         filter_data = handle_filters(filters)
+        filter_chunks = [filter_data[i:i+3] for i in range(0,len(filter_data),3)]
         data_retention = get_property(mgmt_api, req_data['account'], req_data['property'])
         demographics_df = get_demographics_report(analytics)
         fig_female, fig_male = create_piechart(demographics_df)
@@ -153,12 +155,12 @@ def google_audit():
                 return flask.render_template('account_structure.html', 
                                                 user_info=google_auth.get_user_info(),
                                                 account_name=account['name'],
-                                                users=users,
-                                                filters=filter_data,
+                                                users=user_chunks,
+                                                filters=filter_chunks,
                                                 demographics=[demographics_df.to_html(classes='table')],
                                                 hits_greater = hits_greater,
                                                 data_retention=data_retention,
                                                 ids=['Female', 'Male'],
                                                 graphJSON=graphJSON)
     
-    return flask.render_template('account_structure.html', user_info=google_auth.get_user_info())
+    return flask.render_template('account_structure.html', user_info=flask.session['user'])

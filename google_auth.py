@@ -47,7 +47,9 @@ def get_user_info():
                         'oauth2', 'v2',
                         credentials=credentials)
 
-    return oauth2_client.userinfo().get().execute()
+    flask.session['user'] = oauth2_client.userinfo().get().execute()
+
+    return flask.session['user']
 
 def no_cache(view):
     @functools.wraps(view)
@@ -72,7 +74,7 @@ def login():
     print(state)
 
     flask.session[AUTH_STATE_KEY] = state
-    flask.session.permanent = True
+    flask.session.permanent = False
 
     return flask.redirect(uri, code=302)
 

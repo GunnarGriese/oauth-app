@@ -63,16 +63,68 @@
     <br>
     <br> {% if account_name %}
     <div>
-        <h2>{{ account_name }}</h2>
+        <h2>Account: {{ account_name }}</h2>
+
         <h3>User List</h3>
-        {% for user in users %}
-        <h7>{{ user['userRef']['email'] }}</h7>
-        <ul>
-            {% for permission in user['permissions']['effective'] %}
-            <li>{{ permission }}</li>
-            {% endfor %}
-        </ul>
+        {% for user_list in users %}
+
+        <div class="row">
+            {% if user_list[0] %}
+            <div class="col-4">
+                <div class="card text-white bg-secondary mb-3" style="min-height: 12rem; max-width: 28rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ user_list[0]['userRef']['email'] }}</h5>
+                        <p class="card-text">
+                            <ul>
+                                {% if user_list[0]['permissions']['effective'] %} {% for permission in user_list[0]['permissions']['effective'] %}
+                                <li>{{ permission }}</li>
+                                {% endfor %} {% else %}
+                                <li>Test</li>
+                                {% endif %}
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %} {% if user_list[1] %}
+            <div class="col-4">
+                <div class="card text-white bg-secondary mb-3" style="min-height: 12rem; max-width: 28rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ user_list[1]['userRef']['email'] }}</h5>
+                        <p class="card-text">
+                            <ul>
+                                {% if user_list[1]['permissions']['effective'] %} {% for permission in user_list[1]['permissions']['effective'] %}
+                                <li>{{ permission }}</li>
+                                {% endfor %} {% else %}
+                                <li>None (User has permissions on a lower level)</li>
+                                {% endif %}
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %} {% if user_list[2] %}
+            <div class="col-4">
+                <div class="card text-white bg-secondary mb-3" style="min-height: 12rem; max-width: 28rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ user_list[2]['userRef']['email'] }}</h5>
+                        <p class="card-text">
+                            <ul>
+                                {% if user_list[2]['permissions']['effective'] %} {% for permission in user_list[2]['permissions']['effective'] %}
+                                <li>{{ permission }}</li>
+                                {% endfor %} {% else %}
+                                <li>None (User has permissions on a lower level)</li>
+                                {% endif %}
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
         {% endfor %}
+
         </ul>
         <h3>Data Retention</h3>
         <ul>
@@ -80,14 +132,60 @@
             <li>Reset on new activity: {{ data_retention["dataRetentionResetOnNewActivity"] }}</li>
         </ul>
         <h3>Filter Overview</h3>
-        <br> {% for key, value in filters.items() %}
-        <h5> {{ value.name }} [{{ value.type }}]: </h5>
-        <ul>
-            {% for key, value in value.details.items() %}
-            <li> <strong> {{ key }}: </strong>{{ value }} </li>
-            {% endfor %}
-        </ul>
+
+        {% for filter in filters %}
+
+        <div class="row">
+            {% if filter[0] %}
+            <div class="col-4">
+                <div class="card text-white bg-secondary mb-3" style="min-height: 15rem; max-width: 28rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ filter[0].name }}</h5>
+                        <p class="card-text">
+                            <ul>
+                                <li>ID: {{ filter[0].id }}</li>
+                                <li>Type: {{ filter[0].type }}</li>
+                                <li>Details: {{ filter[0].details }}</li>
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %} {% if filter[1] %}
+            <div class="col-4">
+                <div class="card text-white bg-secondary mb-3" style="min-height: 15rem; max-width: 28rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ filter[1].name }}</h5>
+                        <p class="card-text">
+                            <ul>
+                                <li>ID: {{ filter[1].id }}</li>
+                                <li>Type: {{ filter[1].type }}</li>
+                                <li>Details: {{ filter[1].details }}</li>
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %} {% if filter[2] %}
+            <div class="col-4">
+                <div class="card text-white bg-secondary mb-3" style="min-height: 15rem; max-width: 28rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ filter[2].name }}</h5>
+                        <p class="card-text">
+                            <ul>
+                                <li>ID: {{ filter[2].id }}</li>
+                                <li>Type: {{ filter[2].type }}</li>
+                                <li>Details: {{ filter[2].details }}</li>
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
         {% endfor %}
+
         <br>
         <h3>Demographics</h3>
         <div class="container">
@@ -120,6 +218,7 @@
 
 
     </div>
+
     <!-- Add icon library -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <div class="fixed-bottom">

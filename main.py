@@ -31,6 +31,7 @@ app.register_blueprint(account_structure.app)
 def index():
     if google_auth.is_logged_in():
         df = google_sheets.gsheet2df()
+        user = google_auth.get_user_info()
         columns = deque(df.columns.values) 
         columns.appendleft('Index') 
         columns = list(columns) 
@@ -39,6 +40,6 @@ def index():
         df.index.name=None
         for i in google_auth.get_user_info():
             print(i)
-        return flask.render_template('dataframe.html', tables=[df.to_html(classes='table')], titles=columns, user_info=google_auth.get_user_info()) #items['files']
+        return flask.render_template('dataframe.html', tables=[df.to_html(classes='table')], titles=columns, user_info=flask.session['user']) #items['files']
 
     return flask.render_template('index.html')
