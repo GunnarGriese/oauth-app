@@ -12,6 +12,7 @@ import requests
 import plotly.graph_objects as go
 import plotly
 import json
+import time
 from utils import Filter, response2df, AnalyticsReporting, AnalyticsManagement
 
 SCOPES = ['https://www.googleapis.com/auth/analytics.readonly']
@@ -30,6 +31,12 @@ def get_accounts(api_service):
     accounts = api_service.management().accounts().list().execute()
     return accounts
 
+def get_accounts_for_drop(api_service):
+    accounts_json = api_service.management().accounts().list().execute()
+    account_items = accounts_json.get('items', [])
+    account_dict = {account['id']:account['name'] for account in account_items}
+    return account_dict
+
 def get_account_users(api_service, account_id):
     response = api_service.management().accountUserLinks().list(accountId=account_id).execute()
     users = response.get('items', [])
@@ -45,6 +52,13 @@ def get_property(api_service, account_id, property_id):
         accountId=account_id,
         webPropertyId=property_id).execute()
     return prop
+
+def list_properties(api_service, account_id):
+    props = api_service.management().webproperties().list(
+        accountId=account_id).execute()
+    props_items = props.get('items', [])
+    prop_list = ['{} - {}'.format(prop['id'], prop['name']) for prop in props_items]
+    return prop_list
 
 def get_view_filters(mgmt_api, account_id, property_id, view_id):
     response = mgmt_api.management().profileFilterLinks().list(
@@ -130,10 +144,12 @@ def get_hits_report(analytics):
 @app.route('/ga-account-structure', methods=['GET', 'POST'])
 def google_audit():
     mgmt_api = build_mgmt_service()
-    #reporting_api = build_reporting_service()
+    #flask.session['mgmt_api'] = mgmt_api
+    accounts = get_accounts_for_drop(mgmt_api)
     req_data = flask.request.form
-    print(flask.request.method)
+    
     if flask.request.method == "POST":
+        print(req_data['account'])
         analytics = AnalyticsReporting(view_id=req_data['view'])
         #mgmt = AnalyticsManagement(req_data['account'], req_data['property'], req_data['view'])
         #us = mgmt.list_account_users()
@@ -163,4 +179,20 @@ def google_audit():
                                                 ids=['Female', 'Male'],
                                                 graphJSON=graphJSON)
     
-    return flask.render_template('account_structure.html', user_info=flask.session['user'])
+    return flask.render_template('account_structure.html', user_info=flask.session['user'], accounts=accounts)
+
+
+
+@app.route('/get-properties/<account_id>')
+def get_properties(account_id):
+    start_time = time.time()
+    mgmt_api = build_mgmt_service()
+    #mgmt_api = flask.session['mgmt_api']
+    t = time.time() - start_time
+    print("Build Service: {}".format(t))
+    start_time = time.time()
+    prop_list = list_properties(mgmt_api, account_id)
+    t = time.time() - start_time   
+    print("Build List: {}".format(t))                           
+    return flask.jsonify(prop_list)
+

@@ -9,8 +9,12 @@
     <script type="text/javascript" src="{{ url_for('static', filename='tracking.js') }}"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='form_fill.js') }}"></script>
     <!--<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">-->
-
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     <title>GA Audit</title>
 </head>
 
@@ -47,13 +51,27 @@
         <form action="/ga-account-structure" method="POST">
             <div class="row">
                 <div class="col">
-                    <input type="text" class="form-control" name="account" placeholder="Account">
+                    <!--<input type="text" class="form-control" name="account" placeholder="Account">-->
+                    <label for="exampleFormControlSelect1">Account ID</label>
+                    <select class="form-control" id="account-id" name="account">
+                        {% for key, value in accounts.items() %}
+                        <option>{{ key }} - {{ value }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <div class="col">
-                    <input type="text" class="form-control" name="property" placeholder="Property">
+                    <!--<input type="text" class="form-control" name="property" placeholder="Property">-->
+                    <label for="exampleFormControlSelect1">Property ID</label>
+                    <select class="form-control" id="property-id" name="property">
+                        
+                    </select>
                 </div>
                 <div class="col">
-                    <input type="text" class="form-control" name="view" placeholder="View">
+                    <!--<input type="text" class="form-control" name="view" placeholder="View">-->
+                    <label for="exampleFormControlSelect1">View ID</label>
+                    <select class="form-control" id="view-id" name="view">
+                        
+                    </select>
                 </div>
             </div>
             <br>
@@ -64,8 +82,8 @@
     <br> {% if account_name %}
     <div>
         <h2>Account: {{ account_name }}</h2>
-
-        <h3>User List</h3>
+        <br>
+        <h3>Users & Permissions</h3>
         {% for user_list in users %}
 
         <div class="row">
@@ -126,11 +144,24 @@
         {% endfor %}
 
         </ul>
-        <h3>Data Retention</h3>
-        <ul>
-            <li>Data retention period: {{ data_retention["dataRetentionTtl"] }}</li>
-            <li>Reset on new activity: {{ data_retention["dataRetentionResetOnNewActivity"] }}</li>
-        </ul>
+        <h3>Data Retention Settings</h3>
+        <br>
+        <div class="row">
+            <div class="col-4">
+                <div class="card text-white bg-secondary mb-3" style="min-height: 12rem; max-width: 28rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">Data Retention Details</h5>
+                        <p class="card-text">
+                            <ul>
+                                <li>Data retention period: <strong>{{ data_retention["dataRetentionTtl"] }}</strong></li>
+                                <li>Reset on new activity: <strong>{{ data_retention["dataRetentionResetOnNewActivity"] }}</strong></li>
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <h3>Filter Overview</h3>
 
         {% for filter in filters %}
@@ -198,7 +229,6 @@
                 {% endfor %}
             </div>
         </div>
-
         <script type="text/javascript">
             const graphs = JSON.parse('{{ graphJSON|safe }}');
             console.log(graphs)
@@ -210,10 +240,23 @@
             }
         </script>
         <br>
-        <h3>10 mio. hit limit</h3>
-        <ul>
-            <li>{{ hits_greater['text'] }} Your hit count for the last 30 days is: {{ hits_greater['hit_count'] }}</li>
-        </ul>
+        <h3>10 Mio. Hit Limit</h3>
+        <br>
+        <div class="row">
+            <div class="col-4">
+                <div class="card text-white bg-secondary mb-3" style="min-height: 12rem; max-width: 28rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">Hit Limit Details</h5>
+                        <p class="card-text">
+                            <ul>
+                                <li>{{ hits_greater['text'] }}</li>
+                                <li>Your hit count for the last 30 days is: <strong>{{ hits_greater['hit_count'] }}</strong></li>
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
         {% endif %}
 
 
@@ -224,9 +267,7 @@
     <div class="fixed-bottom">
         <p class="text-center">Made with <i class="icon ion-heart"></i> in Copenhagen</p>
     </div>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
 </body>
 
 </html>
