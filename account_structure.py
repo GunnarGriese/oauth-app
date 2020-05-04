@@ -90,6 +90,15 @@ def handle_filters(filter_list):
 
     return filter_dict
 
+def list_views(api_service, account_id, property_id):
+    views_raw = api_service.management().profiles().list(
+      accountId=account_id,
+      webPropertyId=property_id).execute()
+    view_items = views_raw.get('items', [])
+    print(view_items)
+    view_list = ['{} - {}'.format(view['id'], view['name']) for view in view_items]
+    return view_list
+
 def get_demographics_report(analytics):
     df = analytics.report(
         dimensions=[{'name': 'ga:userGender'}, {'name': 'ga:userAgeBracket'}],
@@ -185,14 +194,16 @@ def google_audit():
 
 @app.route('/get-properties/<account_id>')
 def get_properties(account_id):
-    start_time = time.time()
+    flask.session['account_id'] = account_id
     mgmt_api = build_mgmt_service()
-    #mgmt_api = flask.session['mgmt_api']
-    t = time.time() - start_time
-    print("Build Service: {}".format(t))
-    start_time = time.time()
-    prop_list = list_properties(mgmt_api, account_id)
-    t = time.time() - start_time   
-    print("Build List: {}".format(t))                           
+    prop_list = list_properties(mgmt_api, account_id)                          
     return flask.jsonify(prop_list)
+
+@app.route('/get-views/<property_id>')
+def get_views(property_id):
+    account_id = flask.session['account_id']
+    mgmt_api = build_mgmt_service()
+    view_list = list_views(mgmt_api, account_id, property_id) 
+    print(view_list)                         
+    return flask.jsonify(view_list)
 

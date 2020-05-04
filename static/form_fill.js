@@ -12,8 +12,7 @@ $(document).ready(function() {
 
                 // Remove old options
                 $('#property-id').find('option').remove();
-                console.log(data)
-                    // Add new items
+                // Add new items
                 $.each(data, function(key, val) {
                     var option_item = '<option value="' + val + '">' + val + '</option>'
                     $('#property-id').append(option_item);
@@ -27,8 +26,10 @@ $(document).ready(function() {
     $('#property-id').change(function() {
 
         var propertyIdRaw = $('#property-id').val();
-        console.log(propertyIdRaw);
-        var propertyId = propertyIdRaw.slice(0, 14);
+        propertyIdRaws = propertyIdRaw.split(" ");
+        console.log(propertyIdRaws[0].trim());
+        var propertyId = propertyIdRaws[0].trim();
+        console.log(propertyId);
 
         // Make Ajax Request and expect JSON-encoded data
         $.getJSON(
