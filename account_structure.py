@@ -152,31 +152,37 @@ def get_hits_report(analytics):
 
 @app.route('/ga-account-structure', methods=['GET', 'POST'])
 def google_audit():
+
     mgmt_api = build_mgmt_service()
     #flask.session['mgmt_api'] = mgmt_api
-    accounts = get_accounts_for_drop(mgmt_api)
-    req_data = flask.request.form
+    account_drop = get_accounts_for_drop(mgmt_api)
     
     if flask.request.method == "POST":
-        print(req_data['account'])
-        analytics = AnalyticsReporting(view_id=req_data['view'])
+        req_data = flask.request.form
+        account_id = req_data['account'].split(" ")[0]
+        property_id = req_data['property'].split(" ")[0]
+        view_id = req_data['view'].split(" ")[0]
+        print(account_id)
+        print(property_id)
+        print(view_id)
+        analytics = AnalyticsReporting(view_id=view_id)
         #mgmt = AnalyticsManagement(req_data['account'], req_data['property'], req_data['view'])
         #us = mgmt.list_account_users()
         #mgmt.get_property()
         accounts = get_accounts(mgmt_api)
-        users = get_account_users(mgmt_api, req_data['account'])
+        users = get_account_users(mgmt_api, account_id)
         user_chunks = [users[i:i+3] for i in range(0,len(users),3)]
-        filters = get_account_filters(mgmt_api, req_data['account'])
+        filters = get_account_filters(mgmt_api, account_id)
         filter_data = handle_filters(filters)
         filter_chunks = [filter_data[i:i+3] for i in range(0,len(filter_data),3)]
-        data_retention = get_property(mgmt_api, req_data['account'], req_data['property'])
+        data_retention = get_property(mgmt_api, account_id, property_id)
         demographics_df = get_demographics_report(analytics)
         fig_female, fig_male = create_piechart(demographics_df)
         graphs = [fig_female, fig_male]
         graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
         hits_greater = get_hits_report(analytics)
         for account in accounts['items']:
-            if account['id'] == req_data['account']:
+            if account['id'] == account_id:
                 return flask.render_template('account_structure.html', 
                                                 user_info=google_auth.get_user_info(),
                                                 account_name=account['name'],
@@ -186,9 +192,10 @@ def google_audit():
                                                 hits_greater = hits_greater,
                                                 data_retention=data_retention,
                                                 ids=['Female', 'Male'],
-                                                graphJSON=graphJSON)
+                                                graphJSON=graphJSON,
+                                                accounts=account_drop)
     
-    return flask.render_template('account_structure.html', user_info=flask.session['user'], accounts=accounts)
+    return flask.render_template('account_structure.html', user_info=flask.session['user'], accounts=account_drop)
 
 
 
