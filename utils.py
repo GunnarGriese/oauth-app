@@ -3,12 +3,13 @@ import google_auth
 import googleapiclient.discovery
 
 class Filter:
-    def __init__(self, f_id,f_name, f_type, f_update, f_details=None):
+    def __init__(self, f_id,f_name, f_type, f_update, f_details=None, f_rank=None):
         self.id = f_id
         self.name = f_name
         self.type = f_type
         self.update = f_update
         self.details = f_details
+        self.rank = f_rank
 
 def response2df(report):
     """Parses and prints the Analytics Reporting API V4 response"""

@@ -66,7 +66,12 @@ def get_view_filters(mgmt_api, account_id, property_id, view_id):
       webPropertyId=property_id,
       profileId=view_id).execute()
     view_filters = response.get('items', [])
-    return view_filters
+    view_filter_list = []
+    for filter_obj in view_filters:
+        filter_id = filter_obj['id'].split(':')[1]
+        rank = filter_obj['rank']
+        view_filter_list.append({'id': filter_id, 'rank': rank})
+    return view_filter_list
 
 def handle_filters(filter_list):
     filter_dict = []
@@ -152,27 +157,38 @@ def get_hits_report(analytics):
 def google_audit():
 
     mgmt_api = build_mgmt_service()
-    #flask.session['mgmt_api'] = mgmt_api
     account_drop = get_accounts_for_drop(mgmt_api)
     
     if flask.request.method == "POST":
+        # GA information processing
         req_data = flask.request.form
         account_id = req_data['account'].split(" ")[0]
         property_id = req_data['property'].split(" ")[0]
         view_id = req_data['view'].split(" ")[0]
         analytics = AnalyticsReporting(view_id=view_id)
-        #mgmt = AnalyticsManagement(req_data['account'], req_data['property'], req_data['view'])
-        #us = mgmt.list_account_users()
-        #mgmt.get_property()
+
+        # User account eval
         accounts = get_accounts(mgmt_api)
         users = get_account_users(mgmt_api, account_id)
         user_chunks = [users[i:i+3] for i in range(0,len(users),3)]
+
+        # Filter eval
         filters = get_account_filters(mgmt_api, account_id)
         filter_data = handle_filters(filters)
-        filter_chunks = [filter_data[i:i+3] for i in range(0,len(filter_data),3)]
+        view_filters = get_view_filters(mgmt_api, account_id, property_id, view_id)
+        final_filters = []
+        
+        for filter_obj in filter_data:
+            if filter_obj.id in [f['id'] for f in view_filters]:
+                filter_obj.rank = [f['rank'] for f in view_filters if f['id']==filter_obj.id ][0]
+                final_filters.append(filter_obj)
+        filter_chunks = [final_filters[i:i+3] for i in range(0,len(final_filters),3)]
+        
+        # Data retention
         data_retention = get_property(mgmt_api, account_id, property_id)
+        
+        # Demographics
         demographics_df = get_demographics_report(analytics)
-        print(demographics_df)
         if demographics_df.shape[0] == 0:
             demographics_bool = False
         else:
@@ -180,6 +196,8 @@ def google_audit():
         fig_female, fig_male = create_piechart(demographics_df)
         graphs = [fig_female, fig_male]
         graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
+        
+        # Hit limit
         hits_greater = get_hits_report(analytics)
         for account in accounts['items']:
             if account['id'] == account_id:
@@ -195,11 +213,11 @@ def google_audit():
                                                 graphJSON=graphJSON,
                                                 demographics_bool=demographics_bool,
                                                 accounts=account_drop)
-    
+    # GET request
     return flask.render_template('account_structure.html', user_info=flask.session['user'], accounts=account_drop)
 
 
-
+# Dropdown functionality - Account
 @app.route('/get-properties/<account_id>')
 def get_properties(account_id):
     flask.session['account_id'] = account_id
@@ -207,6 +225,7 @@ def get_properties(account_id):
     prop_list = list_properties(mgmt_api, account_id)                          
     return flask.jsonify(prop_list)
 
+# Dropdown functionality - Property
 @app.route('/get-views/<property_id>')
 def get_views(property_id):
     account_id = flask.session['account_id']

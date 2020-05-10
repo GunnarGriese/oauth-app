@@ -29,6 +29,9 @@
             </div>
         </div>
         <br>
-        <input type="submit" class="btn btn-success"></input>
+        <input type="submit" class="btn btn-success" onclick="$('#loading').show();"></input>
     </form>
+</div>
+<div class="d-flex justify-content-center">
+    <p id="loading" style="display:none;"><img src="{{ url_for('static', filename='66.gif') }}" alt="" /></p>
 </div>

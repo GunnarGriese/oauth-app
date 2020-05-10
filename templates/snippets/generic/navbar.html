@@ -1,0 +1,23 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="/">App Overview</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="/ga-account-structure">Account Structure<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="/ga-settings">GA Settings<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="/ga-data">GA Data<span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        <span class="navbar-text mr-2 text-white">
+        Currently logged in as {{ user_info['given_name'] }} {{ user_info['family_name'] }}
+      </span>
+        <a href="/google/logout" class="btn btn-danger" role="button" aria-pressed="true">Logout</a>
+    </div>
+</nav>

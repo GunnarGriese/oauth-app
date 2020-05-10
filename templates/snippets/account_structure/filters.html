@@ -1,13 +1,23 @@
 <h3>Filter Overview</h3>
-
-{% for filter in filters %}
+{% if not filters %}
+<br>
+<div class="row">
+    <div class="col-4">
+        <div class="card text-white bg-secondary mb-3" style="min-height: 6rem; max-width: 28rem;">
+            <div class="card-body">
+                <h5 class="card-title">No filters defined for the given view.</h5>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %} {% for filter in filters %}
 
 <div class="row">
     {% if filter[0] %}
     <div class="col-4">
         <div class="card text-white bg-secondary mb-3" style="max-width: 28rem;">
             <div class="card-body">
-                <h5 class="card-title">{{ filter[0].name }}</h5>
+                <h5 class="card-title">Rank: {{ filter[0].rank }} - {{ filter[0].name }}</h5>
                 <p class="card-text">
                     <ul>
                         <li>ID: {{ filter[0].id }}</li>
@@ -33,7 +43,7 @@
     <div class="col-4">
         <div class="card text-white bg-secondary mb-3" style="max-width: 28rem;">
             <div class="card-body">
-                <h5 class="card-title">{{ filter[1].name }}</h5>
+                <h5 class="card-title">Rank: {{ filter[1].rank }} - {{ filter[1].name }}</h5>
                 <p class="card-text">
                     <ul>
                         <li>ID: {{ filter[1].id }}</li>
@@ -59,7 +69,7 @@
     <div class="col-4">
         <div class="card text-white bg-secondary mb-3" style="max-width: 28rem;">
             <div class="card-body">
-                <h5 class="card-title">{{ filter[2].name }}</h5>
+                <h5 class="card-title">Rank: {{ filter[2].rank }} - {{ filter[2].name }}</h5>
                 <p class="card-text">
                     <ul>
                         <li>ID: {{ filter[2].id }}</li>
@@ -86,4 +96,23 @@
     {% endif %}
 </div>
 
-{% endfor %}
+{% endfor %} {% endif %}
+<p>
+    <a class="btn btn-warning" data-toggle="collapse" href="#collapseFilterBest" role="button" aria-expanded="false" aria-controls="collapseExample">
+                    Best Practices
+                    </a>
+</p>
+<div class="collapse" id="collapseFilterBest">
+    <div class="card text-white bg-secondary mb-3">
+        <div class="card-body">
+            <h5 class="card-title">These filters should be present in your view to achieve high quality data:</h5>
+            <p class="card-text">
+                <ul>
+                    <li><a href="https://support.google.com/analytics/answer/1034840?hl=en" target="_blank">IP filter</a> (exclude internal and agency traffic)</li>
+                    <li><a href="https://support.google.com/analytics/answer/1033162?hl=en" target="_blank">Hostname filter</a> (include only traffic to the relevant domain)</li>
+                    <li>Keep in mind that filters are executed in a subsequent order (indicated by the rank). Pay attention to any dependencies that might occur!</li>
+                </ul>
+            </p>
+        </div>
+    </div>
+</div>
