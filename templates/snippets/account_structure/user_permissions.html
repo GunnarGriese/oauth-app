@@ -1,0 +1,82 @@
+<h3>Users & Permissions</h3>
+{% for user_list in users %}
+
+<div class="row">
+    {% if user_list[0] %}
+    <div class="col-4">
+        <div class="card text-white bg-secondary mb-3" style="max-width: 28rem;">
+            <div class="card-body">
+                <h5 class="card-title">{{ user_list[0]['userRef']['email'] }}</h5>
+                <p class="card-text">
+                    <p>
+                        <a class="btn btn-primary" data-toggle="collapse" href="#userPermissions-{{ loop.index }}-1" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                          Permission Details
+                                        </a>
+                    </p>
+                    <div class="collapse" id="userPermissions-{{ loop.index }}-1">
+                        <ul>
+                            {% if user_list[0]['permissions']['effective'] %} {% for permission in user_list[0]['permissions']['effective'] %}
+                            <li>{{ permission }}</li>
+                            {% endfor %} {% else %}
+                            <li>None (User has permissions on a lower level)</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %} {% if user_list[1] %}
+    <div class="col-4">
+        <div class="card text-white bg-secondary mb-3" style="max-width: 28rem;">
+            <div class="card-body">
+                <h5 class="card-title">{{ user_list[1]['userRef']['email'] }}</h5>
+                <p class="card-text">
+                    <p>
+                        <a class="btn btn-primary" data-toggle="collapse" href="#userPermissions-{{ loop.index }}-2" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                          Permission Details
+                                        </a>
+                    </p>
+                    <div class="collapse" id="userPermissions-{{ loop.index }}-2">
+                        <ul>
+                            {% if user_list[1]['permissions']['effective'] %} {% for permission in user_list[1]['permissions']['effective'] %}
+                            <li>{{ permission }}</li>
+                            {% endfor %} {% else %}
+                            <li>None (User has permissions on a lower level)</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %} {% if user_list[2] %}
+    <div class="col-4">
+        <div class="card text-white bg-secondary mb-3" style="max-width: 28rem;">
+            <div class="card-body">
+                <h5 class="card-title">{{ user_list[2]['userRef']['email'] }}</h5>
+                <p class="card-text">
+                    <p>
+                        <a class="btn btn-primary" data-toggle="collapse" href="#userPermissions-{{ loop.index }}-3" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                          Permission Details
+                                        </a>
+                    </p>
+                    <div class="collapse" id="userPermissions-{{ loop.index }}-3">
+                        <ul>
+                            {% if user_list[2]['permissions']['effective'] %} {% for permission in user_list[2]['permissions']['effective'] %}
+                            <li>{{ permission }}</li>
+                            {% endfor %} {% else %}
+                            <li>None (User has permissions on a lower level)</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endfor %}

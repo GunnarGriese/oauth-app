@@ -11,10 +11,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js" crossorigin="anonymous"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='form_fill.js') }}"></script>
-    <!--<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">-->
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
     <title>GA Audit</title>
 </head>
 
@@ -44,229 +43,37 @@
             <a href="/google/logout" class="btn btn-danger" role="button" aria-pressed="true">Logout</a>
         </div>
     </nav>
-    <div>
-        <h3 class="p-3 mb-2 bg-dark text-white">Audit Input</h3>
-    </div>
-    <div>
-        <form action="/ga-account-structure" method="POST">
-            <div class="row">
-                <div class="col">
-                    <!--<input type="text" class="form-control" name="account" placeholder="Account">-->
-                    <label for="exampleFormControlSelect1">Account ID</label>
-                    <select class="form-control" id="account-id" name="account">
-                        {% for key, value in accounts.items() %}
-                        <option>{{ key }} - {{ value }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col">
-                    <!--<input type="text" class="form-control" name="property" placeholder="Property">-->
-                    <label for="exampleFormControlSelect1">Property ID</label>
-                    <select class="form-control" id="property-id" name="property">
-                        
-                    </select>
-                </div>
-                <div class="col">
-                    <!--<input type="text" class="form-control" name="view" placeholder="View">-->
-                    <label for="exampleFormControlSelect1">View ID</label>
-                    <select class="form-control" id="view-id" name="view">
-                        
-                    </select>
-                </div>
-            </div>
-            <br>
-            <input type="submit" class="btn btn-success"></input>
-        </form>
-    </div>
+    <br> {% include 'snippets/generic/ga_form.html' %}
     <br>
     <br> {% if account_name %}
     <div>
-        <h2>Account: {{ account_name }}</h2>
+        <!-- Account Name -->
+        {% include 'snippets/account_structure/account_name.html' %}
         <br>
-        <h3>Users & Permissions</h3>
-        {% for user_list in users %}
+        <!-- Users & Permissions -->
+        {% include 'snippets/account_structure/user_permissions.html' %}
 
-        <div class="row">
-            {% if user_list[0] %}
-            <div class="col-4">
-                <div class="card text-white bg-secondary mb-3" style="min-height: 12rem; max-width: 28rem;">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ user_list[0]['userRef']['email'] }}</h5>
-                        <p class="card-text">
-                            <ul>
-                                {% if user_list[0]['permissions']['effective'] %} {% for permission in user_list[0]['permissions']['effective'] %}
-                                <li>{{ permission }}</li>
-                                {% endfor %} {% else %}
-                                <li>Test</li>
-                                {% endif %}
-                            </ul>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            {% endif %} {% if user_list[1] %}
-            <div class="col-4">
-                <div class="card text-white bg-secondary mb-3" style="min-height: 12rem; max-width: 28rem;">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ user_list[1]['userRef']['email'] }}</h5>
-                        <p class="card-text">
-                            <ul>
-                                {% if user_list[1]['permissions']['effective'] %} {% for permission in user_list[1]['permissions']['effective'] %}
-                                <li>{{ permission }}</li>
-                                {% endfor %} {% else %}
-                                <li>None (User has permissions on a lower level)</li>
-                                {% endif %}
-                            </ul>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            {% endif %} {% if user_list[2] %}
-            <div class="col-4">
-                <div class="card text-white bg-secondary mb-3" style="min-height: 12rem; max-width: 28rem;">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ user_list[2]['userRef']['email'] }}</h5>
-                        <p class="card-text">
-                            <ul>
-                                {% if user_list[2]['permissions']['effective'] %} {% for permission in user_list[2]['permissions']['effective'] %}
-                                <li>{{ permission }}</li>
-                                {% endfor %} {% else %}
-                                <li>None (User has permissions on a lower level)</li>
-                                {% endif %}
-                            </ul>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-        </div>
+        <!-- Data Retention Settings -->
+        {% include 'snippets/account_structure/data_retention.html' %}
 
-        {% endfor %}
-
-        </ul>
-        <h3>Data Retention Settings</h3>
-        <br>
-        <div class="row">
-            <div class="col-4">
-                <div class="card text-white bg-secondary mb-3" style="min-height: 12rem; max-width: 28rem;">
-                    <div class="card-body">
-                        <h5 class="card-title">Data Retention Details</h5>
-                        <p class="card-text">
-                            <ul>
-                                <li>Data retention period: <strong>{{ data_retention["dataRetentionTtl"] }}</strong></li>
-                                <li>Reset on new activity: <strong>{{ data_retention["dataRetentionResetOnNewActivity"] }}</strong></li>
-                            </ul>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <h3>Filter Overview</h3>
-
-        {% for filter in filters %}
-
-        <div class="row">
-            {% if filter[0] %}
-            <div class="col-4">
-                <div class="card text-white bg-secondary mb-3" style="min-height: 15rem; max-width: 28rem;">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ filter[0].name }}</h5>
-                        <p class="card-text">
-                            <ul>
-                                <li>ID: {{ filter[0].id }}</li>
-                                <li>Type: {{ filter[0].type }}</li>
-                                <li>Details: {{ filter[0].details }}</li>
-                            </ul>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            {% endif %} {% if filter[1] %}
-            <div class="col-4">
-                <div class="card text-white bg-secondary mb-3" style="min-height: 15rem; max-width: 28rem;">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ filter[1].name }}</h5>
-                        <p class="card-text">
-                            <ul>
-                                <li>ID: {{ filter[1].id }}</li>
-                                <li>Type: {{ filter[1].type }}</li>
-                                <li>Details: {{ filter[1].details }}</li>
-                            </ul>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            {% endif %} {% if filter[2] %}
-            <div class="col-4">
-                <div class="card text-white bg-secondary mb-3" style="min-height: 15rem; max-width: 28rem;">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ filter[2].name }}</h5>
-                        <p class="card-text">
-                            <ul>
-                                <li>ID: {{ filter[2].id }}</li>
-                                <li>Type: {{ filter[2].type }}</li>
-                                <li>Details: {{ filter[2].details }}</li>
-                            </ul>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-
-        {% endfor %}
+        <!-- Filters -->
+        {% include 'snippets/account_structure/filters.html' %}
 
         <br>
-        <h3>Demographics</h3>
-        <div class="container">
-            <div class="row">
-                {% for id in ids %}
-                <div class="col-sm">
-                    <h7>{{ id }}</h7>
-                    <div id="{{id}}"></div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        <script type="text/javascript">
-            const graphs = JSON.parse('{{ graphJSON|safe }}');
-            console.log(graphs)
-            const ids = ['Female', 'Male'];
-            console.log(ids)
-            for (let i in graphs) {
-                console.log(ids[i])
-                Plotly.plot(ids[i], graphs[i].data, graphs[i].layout);
-            }
-        </script>
+
+        <!-- Demographics -->
+        {% include 'snippets/account_structure/demographics.html' %}
         <br>
-        <h3>10 Mio. Hit Limit</h3>
-        <br>
-        <div class="row">
-            <div class="col-4">
-                <div class="card text-white bg-secondary mb-3" style="min-height: 12rem; max-width: 28rem;">
-                    <div class="card-body">
-                        <h5 class="card-title">Hit Limit Details</h5>
-                        <p class="card-text">
-                            <ul>
-                                <li>{{ hits_greater['text'] }}</li>
-                                <li>Your hit count for the last 30 days is: <strong>{{ hits_greater['hit_count'] }}</strong></li>
-                            </ul>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
+
+        <!-- 10 Mio. Hit Limit -->
+        {% include 'snippets/account_structure/hit_limit.html' %}
 
 
     </div>
+    {% endif %}
 
-    <!-- Add icon library -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <div class="fixed-bottom">
-        <p class="text-center">Made with <i class="icon ion-heart"></i> in Copenhagen</p>
-    </div>
+    <!-- Sticky icon -->
+    {% include 'snippets/generic/sticky_icon.html' %}
 
 </body>
 

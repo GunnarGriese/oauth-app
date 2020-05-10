@@ -1,0 +1,89 @@
+<h3>Filter Overview</h3>
+
+{% for filter in filters %}
+
+<div class="row">
+    {% if filter[0] %}
+    <div class="col-4">
+        <div class="card text-white bg-secondary mb-3" style="max-width: 28rem;">
+            <div class="card-body">
+                <h5 class="card-title">{{ filter[0].name }}</h5>
+                <p class="card-text">
+                    <ul>
+                        <li>ID: {{ filter[0].id }}</li>
+                        <li>Type: {{ filter[0].type }}</li>
+                    </ul>
+                    <p>
+                        <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample{{ loop.index }}-1" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                          Filter Details
+                                        </a>
+                    </p>
+                    <div class="collapse" id="collapseExample{{ loop.index }}-1">
+                        <ul>
+                            {% for key,value in filter[0].details.items() %}
+                            <li>{{ key }}: {{ value }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %} {% if filter[1] %}
+    <div class="col-4">
+        <div class="card text-white bg-secondary mb-3" style="max-width: 28rem;">
+            <div class="card-body">
+                <h5 class="card-title">{{ filter[1].name }}</h5>
+                <p class="card-text">
+                    <ul>
+                        <li>ID: {{ filter[1].id }}</li>
+                        <li>Type: {{ filter[1].type }}</li>
+                    </ul>
+                    <p>
+                        <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample{{ loop.index }}-2" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                          Filter Details
+                                        </a>
+                    </p>
+                    <div class="collapse" id="collapseExample{{ loop.index }}-2">
+                        <ul>
+                            {% for key,value in filter[1].details.items() %}
+                            <li>{{ key }}: {{ value }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %} {% if filter[2] %}
+    <div class="col-4">
+        <div class="card text-white bg-secondary mb-3" style="max-width: 28rem;">
+            <div class="card-body">
+                <h5 class="card-title">{{ filter[2].name }}</h5>
+                <p class="card-text">
+                    <ul>
+                        <li>ID: {{ filter[2].id }}</li>
+                        <li>Type: {{ filter[2].type }}</li>
+                    </ul>
+                    <p>
+                        <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample{{ loop.index }}-3" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                          Filter Details
+                                        </a>
+                    </p>
+                    <div class="collapse" id="collapseExample{{ loop.index }}-3">
+                        <ul>
+                            {% for key,value in filter[2].details.items() %}
+                            <li>{{ key }}: {{ value }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endfor %}

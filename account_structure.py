@@ -95,7 +95,6 @@ def list_views(api_service, account_id, property_id):
       accountId=account_id,
       webPropertyId=property_id).execute()
     view_items = views_raw.get('items', [])
-    print(view_items)
     view_list = ['{} - {}'.format(view['id'], view['name']) for view in view_items]
     return view_list
 
@@ -135,7 +134,6 @@ def create_piechart(df):
             )
     fig_female = go.Figure(data=[go.Pie(labels=df_female['Age Bucket'], values=df_female['Sessions'])], layout=layout)
     fig_male = go.Figure(data=[go.Pie(labels=df_male['Age Bucket'], values=df_male['Sessions'])], layout=layout)
-
     return fig_female, fig_male
 
 def get_hits_report(analytics):
@@ -162,9 +160,6 @@ def google_audit():
         account_id = req_data['account'].split(" ")[0]
         property_id = req_data['property'].split(" ")[0]
         view_id = req_data['view'].split(" ")[0]
-        print(account_id)
-        print(property_id)
-        print(view_id)
         analytics = AnalyticsReporting(view_id=view_id)
         #mgmt = AnalyticsManagement(req_data['account'], req_data['property'], req_data['view'])
         #us = mgmt.list_account_users()
@@ -177,6 +172,11 @@ def google_audit():
         filter_chunks = [filter_data[i:i+3] for i in range(0,len(filter_data),3)]
         data_retention = get_property(mgmt_api, account_id, property_id)
         demographics_df = get_demographics_report(analytics)
+        print(demographics_df)
+        if demographics_df.shape[0] == 0:
+            demographics_bool = False
+        else:
+            demographics_bool = True
         fig_female, fig_male = create_piechart(demographics_df)
         graphs = [fig_female, fig_male]
         graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
@@ -188,11 +188,12 @@ def google_audit():
                                                 account_name=account['name'],
                                                 users=user_chunks,
                                                 filters=filter_chunks,
-                                                demographics=[demographics_df.to_html(classes='table')],
+                                                #demographics=[demographics_df.to_html(classes='table')],
                                                 hits_greater = hits_greater,
                                                 data_retention=data_retention,
                                                 ids=['Female', 'Male'],
                                                 graphJSON=graphJSON,
+                                                demographics_bool=demographics_bool,
                                                 accounts=account_drop)
     
     return flask.render_template('account_structure.html', user_info=flask.session['user'], accounts=account_drop)
