@@ -153,16 +153,23 @@ class AnalyticsManagement:
 
     def list_view_filters(self):
         """per default view filters for pre-defined property and view are returned"""
-        view_filters = self.analytics.management().profileFilterLinks().list(
+        response = self.analytics.management().profileFilterLinks().list(
             accountId=self.account_id,
             webPropertyId=self.property_id,
             profileId=self.view_id).execute()
-        return view_filters.get('items', [])
+        view_filters = response.get('items', [])
+        view_filter_list = []
+        for filter_obj in view_filters:
+            filter_id = filter_obj['id'].split(':')[1]
+            rank = filter_obj['rank']
+            view_filter_list.append({'id': filter_id, 'rank': rank})
+        
+        return view_filter_list
 
     def handle_filters(self):
         account_filters = self.list_account_filters()
-        filter_dict = {}
-        for idx, filter in enumerate(account_filters):
+        filter_dict = []
+        for filter in account_filters:
             filter_ins = Filter(f_id=filter['id'], f_name=filter['name'], f_type=filter['type'], f_update=filter['updated'])
             if filter['type'] == "SEARCH_AND_REPLACE":
                 filter_ins.details = filter['searchAndReplaceDetails']
@@ -178,6 +185,6 @@ class AnalyticsManagement:
                 filter_ins.details = filter["advancedDetails"]
             else:
                 filter_ins.details = {'key': 'value'}
-            filter_dict["filter_{}".format(idx)] = filter_ins
+            filter_dict.append(filter_ins)
 
         return filter_dict

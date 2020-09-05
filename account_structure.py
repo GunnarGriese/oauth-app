@@ -42,11 +42,6 @@ def get_account_users(api_service, account_id):
     users = response.get('items', [])
     return users
 
-def get_account_filters(api_service, account_id):
-    response = api_service.management().filters().list(accountId=account_id).execute()
-    filters = response.get('items', [])
-    return filters
-
 def get_property(api_service, account_id, property_id):
     prop = api_service.management().webproperties().get(
         accountId=account_id,
@@ -59,41 +54,6 @@ def list_properties(api_service, account_id):
     props_items = props.get('items', [])
     prop_list = ['{} - {}'.format(prop['id'], prop['name']) for prop in props_items]
     return prop_list
-
-def get_view_filters(mgmt_api, account_id, property_id, view_id):
-    response = mgmt_api.management().profileFilterLinks().list(
-      accountId=account_id,
-      webPropertyId=property_id,
-      profileId=view_id).execute()
-    view_filters = response.get('items', [])
-    view_filter_list = []
-    for filter_obj in view_filters:
-        filter_id = filter_obj['id'].split(':')[1]
-        rank = filter_obj['rank']
-        view_filter_list.append({'id': filter_id, 'rank': rank})
-    return view_filter_list
-
-def handle_filters(filter_list):
-    filter_dict = []
-    for filter in filter_list:
-        filter_ins = Filter(f_id=filter['id'], f_name=filter['name'], f_type=filter['type'], f_update=filter['updated'])
-        if filter['type'] == "SEARCH_AND_REPLACE":
-            filter_ins.details = filter['searchAndReplaceDetails']
-        elif filter['type'] == "INCLUDE":
-            filter_ins.details = filter["includeDetails"]
-        elif filter['type'] == "EXCLUDE":
-            filter_ins.details = filter["excludeDetails"]
-        elif filter['type'] == "LOWERCASE":
-            filter_ins.details = filter["lowercaseDetails"]
-        elif filter['type'] == "UPPERCASE":
-            filter_ins.details = filter["uppercaseDetails"]
-        elif filter['type'] == "ADVANCED":
-            filter_ins.details = filter["advancedDetails"]
-        else:
-            filter_ins.details = {'key': 'value'}
-        filter_dict.append(filter_ins)
-
-    return filter_dict
 
 def list_views(api_service, account_id, property_id):
     views_raw = api_service.management().profiles().list(
@@ -173,9 +133,10 @@ def google_audit():
         user_chunks = [users[i:i+3] for i in range(0,len(users),3)]
 
         # Filter eval
-        filters = get_account_filters(mgmt_api, account_id)
-        filter_data = handle_filters(filters)
-        view_filters = get_view_filters(mgmt_api, account_id, property_id, view_id)
+        management = AnalyticsManagement(account_id=account_id, property_id=property_id, view_id=view_id)
+        filters = management.list_account_filters()
+        filter_data = management.handle_filters()
+        view_filters = management.list_view_filters()
         final_filters = []
         
         for filter_obj in filter_data:
