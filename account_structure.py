@@ -5,7 +5,7 @@ import flask
 from flask import Response
 import googleapiclient.discovery
 import google_auth
-import google_sheets
+#import google_sheets
 from werkzeug.utils import secure_filename
 import pandas as pd
 import requests
@@ -222,7 +222,7 @@ def google_audit():
 def get_properties(account_id):
     flask.session['account_id'] = account_id
     mgmt_api = build_mgmt_service()
-    prop_list = list_properties(mgmt_api, account_id)                          
+    prop_list = list_properties(mgmt_api, account_id)                      
     return flask.jsonify(prop_list)
 
 # Dropdown functionality - Property
@@ -231,6 +231,5 @@ def get_views(property_id):
     account_id = flask.session['account_id']
     mgmt_api = build_mgmt_service()
     view_list = list_views(mgmt_api, account_id, property_id) 
-    print(view_list)                         
     return flask.jsonify(view_list)
 

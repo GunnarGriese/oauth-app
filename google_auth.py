@@ -1,4 +1,5 @@
 # Code walk-through: https://requests-oauthlib.readthedocs.io/en/latest/examples/real_world_example_with_refresh.html
+# # Source: https://www.mattbutton.com/2019/01/05/google-authentication-with-python-and-flask/
 import functools
 import os
 import flask
@@ -14,7 +15,7 @@ REFRESH_URI = ACCESS_TOKEN_URI # True for Google but not all oauth providers.
 AUTHORIZATION_URL = 'https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&prompt=consent'
 BASE_URI = os.environ.get("FN_BASE_URI", default=False)
 
-AUTHORIZATION_SCOPE ='openid email profile https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/analytics.manage.users.readonly'
+AUTHORIZATION_SCOPE ='openid email profile https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/analytics.manage.users.readonly'
 
 # This information is obtained upon registration of a new Google OAuth
 # application at console.developers.google.com
@@ -119,7 +120,7 @@ def google_auth_redirect():
     oauth2_tokens = session.fetch_access_token(
                         ACCESS_TOKEN_URI,            
                         authorization_response=flask.request.url)
-    
+    print(oauth2_tokens)
     # We use the session as a simple DB for this app.
     flask.session[AUTH_TOKEN_KEY] = oauth2_tokens
 

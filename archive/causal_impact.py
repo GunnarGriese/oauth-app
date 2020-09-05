@@ -4,8 +4,8 @@ import tempfile
 import flask
 from flask import Response
 import googleapiclient.discovery
-import google_auth
-import google_sheets
+#import google_auth
+#import google_sheets
 from werkzeug.utils import secure_filename
 import pandas as pd
 import matplotlib

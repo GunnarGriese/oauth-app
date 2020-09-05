@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {% include 'snippets/account_structure/scripts.html' %}
+    <title>Gain insights into your Google Analytics account | GA Audit App</title>
+</head>
+
+<body class="p-3 mb-2 bg-dark text-white">
+    <!-- Navbar -->
+    {% include 'snippets/generic/navbar.html' %}
+
+    <!-- ACCOUNT STRUCTURE -->
+    <div>
+        <br>
+        <h3>Gain insights into your Google Analytics setup:</h3>
+        <br>
+        <div class="row">
+            <!-- ROW -->
+            <div class="col-4">
+                <!-- COLUMN -->
+                <div class="card text-white bg-secondary mb-3" style="max-width: 28rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">GA Account Structure</h5>
+                        <p class="card-text">
+                            Get an overview of your Google Analytics settings:
+                            <ul>
+                                <li>User Access Management</li>
+                                <li>Data Retention Settings</li>
+                                <li>Demographic Data</li>
+                                <li>Hit Limit</li>
+                            </ul>
+                        </p>
+                        <p>
+                            <a class="btn btn-primary" href="/ga-account-structure" role="button">
+                                          Show me now
+                        </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Sticky icon -->
+    {% include 'snippets/generic/sticky_icon.html' %}
+
+</body>
+
+</html>
